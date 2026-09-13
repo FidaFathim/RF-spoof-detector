@@ -45,7 +45,7 @@ def train_baseline(config: dict, split_path: str, out_dir: str) -> RFFingerprint
     data_cfg = config["data"]
     model_cfg = config["baseline_cnn"]
 
-    df = load_wisig(data_cfg["wisig_root"])
+    df = load_wisig(data_cfg["wisig_root"], subset=data_cfg["wisig_subset"], equalized=data_cfg["equalized"])
     split = load_split(split_path)
     parts = apply_split(df, split)
 

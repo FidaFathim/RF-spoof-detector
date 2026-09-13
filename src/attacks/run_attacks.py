@@ -45,7 +45,7 @@ def run(config: dict, checkpoint_path: str, split_path: str, out_dir: str) -> No
     data_cfg = config["data"]
     attack_cfg = config["attacks"]
 
-    df = load_wisig(data_cfg["wisig_root"])
+    df = load_wisig(data_cfg["wisig_root"], subset=data_cfg["wisig_subset"], equalized=data_cfg["equalized"])
     split = load_split(split_path)
     parts = apply_split(df, split)
 

@@ -7,15 +7,13 @@ seed: 0
 seeds_for_variation: [0, 1, 2]   # run the full pipeline 3x, report mean +/- spread
 
 data:
-  wisig_root: data/raw/wisig          # where you extracted the WiSig download
+  wisig_root: data/raw/wisig          # directory containing e.g. ManySig.pkl
+  wisig_subset: ManySig               # ManySig | ManyTx | ManyRx | SingleDay (compact subsets)
+  equalized: 0                        # 0 = raw/non-equalized, 1 = channel-equalized (if available)
   splits_dir: data/splits
-  # Session-aware split: sessions/days listed here go entirely into one split.
-  # Fill these in once inspect_wisig.py shows you the actual day/session identifiers.
-  train_sessions: []
-  val_sessions: []
-  test_sessions: []
-  sample_rate_hz: 20_000_000          # confirm against WiSig documentation for your subset
-  iq_length: 256                      # samples per example fed to the CNN; confirm against data
+  sample_rate_hz: 20_000_000          # ASSUMED 20 MSps (standard 802.11 capture rate) — confirm
+                                       # against the WiSig paper before trusting CFO/phase-noise Hz values
+  iq_length: 256                      # confirmed: WiSig "Id Signals" are 256-sample preambles
 
 baseline_cnn:
   in_channels: 2          # I and Q as separate channels
