@@ -140,7 +140,7 @@ def load_wisig(
             raise ValueError(f"Unknown compact subset {subset!r}, expected one of {COMPACT_SUBSETS}")
         path = root / f"{subset}.pkl"
         if not path.exists():
-            raise FileNotFoundError(f"{path} not found — download it from the WiSig page, see data/README.md")
+            raise FileNotFoundError(f"{path} not found - download it from the WiSig page, see data/README.md")
         df = _load_compact_pickle(path)
     else:
         files = sorted(root.rglob("dataset_*_node*.pkl"))

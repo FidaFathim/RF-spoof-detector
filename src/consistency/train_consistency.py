@@ -16,6 +16,7 @@ import joblib
 import pandas as pd
 
 from ..features.pipeline import FEATURE_COLUMNS
+from ..features.session_normalize import add_session_relative_features, relative_columns
 from ..utils.config import load_config, snapshot_config
 from ..utils.logging_utils import get_logger
 from .calibrate import select_threshold_for_fpr
@@ -27,11 +28,17 @@ logger = get_logger(__name__)
 def run(config: dict, features_csv: str, out_dir: str) -> None:
     gate_cfg = config["consistency_gate"]
     fusion_cfg = config["fusion"]
-    feature_cols = gate_cfg.get("feature_set", FEATURE_COLUMNS)
+    base_cols = gate_cfg.get("feature_set", FEATURE_COLUMNS)
 
     df = pd.read_csv(features_csv)
     # `df` must already carry a `split` column ("train"/"val"/"test") from the feature
     # extraction step — see notebooks/03_feature_extraction.ipynb.
+    if gate_cfg.get("use_session_relative", True):
+        df = add_session_relative_features(df, base_cols)
+        feature_cols = relative_columns(base_cols)
+    else:
+        feature_cols = base_cols
+
     train_df = df[df["split"] == "train"]
     val_df = df[df["split"] == "val"]
 

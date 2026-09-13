@@ -26,10 +26,10 @@ def estimate_cfo(
     are `num_repeats` back-to-back repetitions of the same underlying sequence.
     """
     preamble_len = repeat_len * num_repeats
-    if len(iq) < preamble_len + repeat_len:
+    if len(iq) < preamble_len:
         raise ValueError(
             f"Signal too short ({len(iq)} samples) for {num_repeats} repeats of length "
-            f"{repeat_len} — check preamble_len against your actual capture format."
+            f"{repeat_len} (needs {preamble_len}) - check preamble_len against your actual capture format."
         )
 
     preamble = iq[:preamble_len]

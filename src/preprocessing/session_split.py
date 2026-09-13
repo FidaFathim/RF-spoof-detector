@@ -40,7 +40,7 @@ def make_session_split(
     }
     if not split["test"]:
         raise ValueError(
-            f"Only {n} sessions total — not enough to hold out a test split. "
+            f"Only {n} sessions total - not enough to hold out a test split. "
             "Check that wisig_loader produced multiple (day, rx) combinations."
         )
     return split

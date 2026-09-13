@@ -59,14 +59,25 @@ against the WiSig paper's experimental setup section before trusting the CFO (Hz
 phase-noise (rad) values `src/features/` produces on real data. This doesn't affect
 `iq_length: 256`, which is confirmed correct.
 
-### Raw vs. equalized
+### Raw vs. equalized — CONFIRMED, don't revert this without re-testing
 
-Compact subsets may include both a raw and a channel-equalized version of each signal
-(`equalized_list`). We default to raw (`equalized: 0`) in `configs/default.yaml` because
-channel equalization could partially distort the hardware-impairment features (CFO, I/Q
-imbalance, phase noise) we depend on — but this is a hypothesis, not a confirmed fact.
-Check it empirically: `notebooks/03_feature_extraction.ipynb`'s device-vs-session
-clustering plot is exactly the tool to compare raw vs. equalized on this question.
+`configs/default.yaml` uses `equalized: 1` for everything (CNN **and** physical features).
+This was empirically tested on the real ManySig download, not assumed — see
+`PAPER_NOTES.md`'s "Week 1 empirical findings" section for the full numbers, summarized here:
+
+- Training the baseline CNN on **raw** (`equalized: 0`) signal with a proper session-aware
+  split gives **16.7% test accuracy on held-out sessions — exactly random chance for 6
+  classes.** The CNN overfits to receiver/channel state instead of learning device identity.
+- The same CNN trained on **equalized** (`equalized: 1`) signal gets **100% test accuracy**
+  on the identical held-out sessions.
+- Raw CFO/I-Q-imbalance/phase-noise are *more* per-device-discriminative than the equalized
+  versions of the same features (equalization partially removes the hardware artifacts we
+  want) — but the CNN and the consistency gate must use the SAME signal representation,
+  because the attacker only ever manipulates the one representation the classifier actually
+  consumes. Scoring an attack against a raw-domain gate while the CNN sees equalized input
+  would silently compare two different signal spaces and inflate detection numbers. So both
+  branches use equalized signal, accepting a somewhat less crisp physical fingerprint as the
+  honest cost of a methodologically sound comparison.
 
 ## Session-aware split — read this before splitting anything
 

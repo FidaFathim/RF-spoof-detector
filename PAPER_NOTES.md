@@ -71,6 +71,50 @@ defense type, **whether the defense is structurally separate from the classifier
 after this table exists should the final paper state an exact "N prior papers found" count
 with a search date.
 
+## Week 1 empirical findings (on real ManySig data, 2026-09-14)
+
+These aren't hypothetical concerns anymore — they were reproduced end-to-end against the
+actual downloaded `ManySig.pkl` (6 devices, 12 receivers, 4 capture days, session-aware
+split via `data/splits/split_seed0.json`).
+
+1. **Raw-signal CNN overfits to receiver/channel, not device.** A baseline CNN trained on
+   `equalized: 0` (raw) IQ hit 100% *validation* accuracy but only **16.7% test accuracy on
+   held-out (day, receiver) sessions — indistinguishable from random guessing on 6 classes.**
+   This is the textbook "RFFI classifier learns the channel, not the transmitter" failure
+   this exact literature exists to address (it's the whole premise of WiSig's title, and of
+   Yang et al. 2410.07591's channel-robust PA-nonlinearity feature). Switching to WiSig's
+   channel-equalized variant (`equalized: 1`) fixed it to 100% test accuracy on the same
+   held-out sessions, same architecture, same training budget.
+
+2. **Raw CFO conflates transmitter and receiver oscillator offset, and drifts across days.**
+   CFO is measured as `tx_LO - rx_LO`, so holding the receiver fixed shows clean per-device
+   separation (six devices, means from -223 kHz to +416 kHz, within-device std single-digit
+   kHz) — but holding the *device* fixed and varying the receiver shows the same swing
+   (-243 kHz to +423 kHz), and holding both device AND receiver fixed but varying capture
+   *day* still shows tens-of-kHz drift. A per-device one-class gate trained on some sessions
+   and evaluated on session-aware held-out sessions of the *same* device initially
+   false-rejected **84% of legitimate signals** — almost entirely explained by the CNN
+   failure in finding #1 above (`1 - 0.167 ≈ 0.83`), not the gate itself. Isolating the gate
+   from the CNN showed its own generalization gap was real but much smaller: ~9% false
+   rejection against a 5% calibration target.
+
+3. **Fix: session-relative features.** Subtracting each session's own median feature value
+   (`src/features/session_normalize.py`) — computed across all devices captured in that
+   exact session — before fitting/scoring the gate cancels most of the shared receiver/day
+   component. Test false-rejection rate dropped from ~9% to ~7.5-8% (raw signal) / ~9.1% to
+   ~8.2% (equalized signal). This is a real, if partial, improvement — not a complete fix.
+   **Deployment caveat:** this requires multiple devices' signals from the same session to
+   compute a baseline, which is fine for this offline research evaluation (WiSig sessions
+   have many devices) but is not itself a deployment-ready calibration strategy — say this
+   plainly in the writeup rather than presenting it as solved.
+
+4. **Design decision, with evidence:** use the equalized signal consistently for *both* the
+   CNN and the physical-feature extraction, despite raw features being individually more
+   discriminative in isolation (see `data/README.md`). The alternative (CNN on equalized,
+   gate on raw) would let the gate "detect" attacks partly because attack signals live in a
+   different signal-processing domain than the gate was calibrated on — not because the
+   attack is physically implausible. That would be a methodological confound, not a result.
+
 ## Rules that keep the experiment valid (do not skip these)
 
 - Never train the consistency gate on attack samples.

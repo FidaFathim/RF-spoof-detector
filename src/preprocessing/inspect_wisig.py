@@ -31,7 +31,7 @@ def inspect_compact(path: Path) -> None:
     expected = {"tx_list", "rx_list", "capture_date_list", "equalized_list", "data"}
     missing = expected - set(dataset.keys())
     if missing:
-        print(f"  !! MISSING expected keys: {missing} — wisig_loader.py's _load_compact_pickle will need updating.")
+        print(f"  !! MISSING expected keys: {missing} - wisig_loader.py's _load_compact_pickle will need updating.")
         return
 
     print(f"  tx_list ({len(dataset['tx_list'])}):", dataset["tx_list"][:5], "...")
@@ -44,7 +44,7 @@ def inspect_compact(path: Path) -> None:
     if arr.ndim == 3 and arr.shape[-1] == 2:
         print("  matches expected (n_sig, 256, 2) [I, Q] layout.")
     else:
-        print("  !! UNEXPECTED shape — update _channels_to_complex/_load_compact_pickle in wisig_loader.py.")
+        print("  !! UNEXPECTED shape - update _channels_to_complex/_load_compact_pickle in wisig_loader.py.")
 
     # Find first non-empty leaf to report a realistic n_sig.
     for tx_i in range(len(dataset["tx_list"])):
@@ -95,7 +95,7 @@ def main() -> None:
 
     root = Path(args.root)
     if not root.exists():
-        raise SystemExit(f"{root} does not exist — extract WiSig there first (see data/README.md)")
+        raise SystemExit(f"{root} does not exist - extract WiSig there first (see data/README.md)")
 
     files = sorted(p for p in root.rglob("*") if p.is_file())
     print(f"Found {len(files)} files under {root}")
@@ -120,7 +120,7 @@ def main() -> None:
 
     pkl_files = [f for f in files if f.suffix in (".pkl", ".pickle")]
     if not pkl_files:
-        print("No .pkl files found and no recognized compact-subset filename — check the extraction.")
+        print("No .pkl files found and no recognized compact-subset filename - check the extraction.")
         return
     for f in pkl_files[:3]:
         inspect_generic(f)
