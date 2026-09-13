@@ -1,0 +1,22 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+*.egg-info/
+
+# dataset + large artifacts — never commit these
+data/raw/
+data/processed/
+*.pkl
+*.npy
+*.npz
+*.pt
+*.pth
+
+# results are large / machine-specific; keep only curated tables you choose to commit
+results/*/
+!results/.gitkeep
+
+.DS_Store
+Thumbs.db

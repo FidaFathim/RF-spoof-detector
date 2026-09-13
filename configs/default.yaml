@@ -1,0 +1,78 @@
+# Single source of truth for one experiment run.
+# Log this file (or its resolved copy) alongside every result you report — the project guide
+# requires "fixed experiment configuration and saved code version / package versions".
+
+experiment_name: baseline_v1
+seed: 0
+seeds_for_variation: [0, 1, 2]   # run the full pipeline 3x, report mean +/- spread
+
+data:
+  wisig_root: data/raw/wisig          # where you extracted the WiSig download
+  splits_dir: data/splits
+  # Session-aware split: sessions/days listed here go entirely into one split.
+  # Fill these in once inspect_wisig.py shows you the actual day/session identifiers.
+  train_sessions: []
+  val_sessions: []
+  test_sessions: []
+  sample_rate_hz: 20_000_000          # confirm against WiSig documentation for your subset
+  iq_length: 256                      # samples per example fed to the CNN; confirm against data
+
+baseline_cnn:
+  in_channels: 2          # I and Q as separate channels
+  num_classes: null       # set at runtime from the loaded label set
+  conv_channels: [64, 128, 256]
+  kernel_size: 7
+  dropout: 0.3
+  lr: 1.0e-3
+  batch_size: 128
+  epochs: 30
+  weight_decay: 1.0e-4
+
+features:
+  cfo:
+    preamble_len: 160          # 802.11a/g/n L-STF: 10 repetitions x 16 samples
+    repeat_len: 16
+    num_repeats: 10
+  iq_imbalance:
+    window: preamble           # "preamble" or "full" — which segment to estimate over
+  phase_noise:
+    # phase-noise proxy = std of residual phase (after CFO removal) across repeated segments
+    detrend: true
+
+attacks:
+  fgsm:
+    epsilon: 0.02
+  pgd:
+    epsilon: 0.02
+    alpha: 0.004
+    steps: 20
+  uap:
+    epsilon: 0.02
+    max_iters: 200
+  gan_impersonation:
+    enabled: false   # flip on once the adapted Karunaratne et al. generator is wired up
+  hwe:
+    enabled: false   # stretch goal, week 4 only if ahead of schedule
+
+consistency_gate:
+  method: gaussian        # "gaussian" | "one_class_svm" | "isolation_forest"
+  mode: per_device        # "per_device" | "global" — keep both as an ablation, not a final choice
+  feature_set: [cfo, iq_amp_imbalance, iq_phase_imbalance, phase_noise]
+  one_class_svm:
+    nu: 0.05
+    kernel: rbf
+    gamma: scale
+  isolation_forest:
+    n_estimators: 200
+    contamination: 0.05
+
+fusion:
+  rule: and             # CNN-claims-device AND gate-passes
+  # threshold selected on validation split only — see src/consistency/calibrate.py
+  target_val_false_positive_rate: 0.05
+
+ablations:
+  - cnn_confidence_only
+  - single_feature_gate   # repeated once per feature in feature_set
+  - features_as_classifier_input
+  - separate_consistency_gate   # the actual proposal
