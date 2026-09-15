@@ -8,21 +8,36 @@ Legend: **A** = baseline/attacks partner, **B** = physical-consistency partner.
 
 ## Week 1 — Shared foundation
 
-- [ ] Download WiSig, run `src/preprocessing/inspect_wisig.py` on it, confirm the on-disk
-      structure matches (or fix) `src/preprocessing/wisig_loader.py`.
-- [ ] Build the session-aware train/val/test split (`src/preprocessing/session_split.py`).
+- [x] Download WiSig (ManySig), run `src/preprocessing/inspect_wisig.py` on it, confirm the
+      on-disk structure matches `src/preprocessing/wisig_loader.py`. *(Done 2026-09-14:
+      288,000 signals, 6 tx x 12 rx x 4 days, loader verified against the authors' own code.)*
+- [x] Build the session-aware train/val/test split (`src/preprocessing/session_split.py`).
       **Never split by random packet** — same-session packets share channel/receiver state and
       leak information across the split (this is called out explicitly in the project guide's
       "rules that protect validity").
-- [ ] Record the split seed and commit the split files under `data/splits/`.
-- [ ] A: sketch the CNN architecture (`src/baseline/cnn_model.py`), get one forward pass running
-      on a batch of real WiSig IQ tensors (shape check only, not trained yet).
-- [ ] B: run `tests/test_features_synthetic.py`, confirm all three feature estimators
-      (`src/features/cfo.py`, `iq_imbalance.py`, `phase_noise.py`) recover known synthetic
-      ground truth before touching real signals.
+- [x] Record the split seed and commit the split files under `data/splits/`.
+      *(`split_seed0.json`: 29/10/9 sessions; seeds 1 and 2 are generated on demand by
+      `python -m src.run_pipeline --all-seeds`.)*
+- [x] A: CNN forward pass + training loop verified on real WiSig tensors.
+      **Open:** cross-session generalization. 20k-sample / 5-epoch runs gave chance-level
+      test accuracy; the full 174k train split for 15 epochs reached 71-94% but oscillated
+      (see `PAPER_NOTES.md` #1/#5). `train.py` now has cosine LR decay + best-val
+      checkpointing — first job on Colab is to run it and confirm a stable >=90% held-out
+      test accuracy before anything downstream is trusted.
+- [x] B: `tests/test_features_synthetic.py` green (7/7). Real-data sanity check done: with
+      the receiver held fixed, CFO separates the 6 devices cleanly (means hundreds of kHz
+      apart, within-device std single-digit kHz). Session-relative correction added
+      (`src/features/session_normalize.py`) — required, see `PAPER_NOTES.md` #2/#3.
 
 **Week 1 exit criteria:** loader confirmed against real WiSig files, split files committed,
-synthetic feature tests green.
+synthetic feature tests green. **All met.** Carry-over into week 2: lock in a CNN that
+generalizes across sessions (see above).
+
+**Fast path for week 2:** the whole pipeline is now one command —
+`python -m src.run_pipeline --config configs/default.yaml --seed 0` — producing
+`results/final_seed0/results_table.md`. Run it on Colab GPU first thing; every number in
+that table is the real thing (attacks on the test split, UAP trained on validation, gate
+never sees attacks).
 
 ## Week 2 — Parallel tracks
 
