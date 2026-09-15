@@ -59,25 +59,27 @@ against the WiSig paper's experimental setup section before trusting the CFO (Hz
 phase-noise (rad) values `src/features/` produces on real data. This doesn't affect
 `iq_length: 256`, which is confirmed correct.
 
-### Raw vs. equalized — CONFIRMED, don't revert this without re-testing
+### Raw vs. equalized — read PAPER_NOTES.md, this is NOT a solved question
 
-`configs/default.yaml` uses `equalized: 1` for everything (CNN **and** physical features).
-This was empirically tested on the real ManySig download, not assumed — see
-`PAPER_NOTES.md`'s "Week 1 empirical findings" section for the full numbers, summarized here:
+`configs/default.yaml` uses `equalized: 1`, but **do not assume this alone fixes
+cross-session generalization** — an earlier test claiming it gave 100% test accuracy was
+itself wrong (an evaluation bug: a non-random test subset that turned out to be entirely one
+device). Properly re-measured (random sample and full test set), **both raw and equalized
+signal give the baseline CNN only ~16.7% test accuracy on held-out sessions — random chance
+for 6 classes.** See `PAPER_NOTES.md`'s "Week 1 empirical findings" (#1 and #5) for the full
+story and candidate fixes (transfer learning, spectrogram input, more capacity/augmentation).
 
-- Training the baseline CNN on **raw** (`equalized: 0`) signal with a proper session-aware
-  split gives **16.7% test accuracy on held-out sessions — exactly random chance for 6
-  classes.** The CNN overfits to receiver/channel state instead of learning device identity.
-- The same CNN trained on **equalized** (`equalized: 1`) signal gets **100% test accuracy**
-  on the identical held-out sessions.
+What IS still true and worth keeping:
 - Raw CFO/I-Q-imbalance/phase-noise are *more* per-device-discriminative than the equalized
   versions of the same features (equalization partially removes the hardware artifacts we
-  want) — but the CNN and the consistency gate must use the SAME signal representation,
-  because the attacker only ever manipulates the one representation the classifier actually
-  consumes. Scoring an attack against a raw-domain gate while the CNN sees equalized input
-  would silently compare two different signal spaces and inflate detection numbers. So both
-  branches use equalized signal, accepting a somewhat less crisp physical fingerprint as the
-  honest cost of a methodologically sound comparison.
+  want) — see the per-device CFO separation numbers in `PAPER_NOTES.md`.
+- Whichever signal domain the CNN ends up using once generalization is fixed, the
+  consistency gate must use the SAME domain — the attacker only ever manipulates the one
+  representation the classifier actually consumes, so scoring the gate against a different
+  domain would be a methodological confound, not a real result.
+- **Whatever you evaluate accuracy on, use a random sample or the full split — never a
+  positional slice of a DataFrame.** `wisig_loader.py` groups rows by transmitter first, so
+  `df.head(N)` or `Subset(dataset, range(N))` can silently be all-one-device.
 
 ## Session-aware split — read this before splitting anything
 

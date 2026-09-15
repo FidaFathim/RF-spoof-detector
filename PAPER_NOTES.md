@@ -77,14 +77,25 @@ These aren't hypothetical concerns anymore — they were reproduced end-to-end a
 actual downloaded `ManySig.pkl` (6 devices, 12 receivers, 4 capture days, session-aware
 split via `data/splits/split_seed0.json`).
 
-1. **Raw-signal CNN overfits to receiver/channel, not device.** A baseline CNN trained on
-   `equalized: 0` (raw) IQ hit 100% *validation* accuracy but only **16.7% test accuracy on
-   held-out (day, receiver) sessions — indistinguishable from random guessing on 6 classes.**
-   This is the textbook "RFFI classifier learns the channel, not the transmitter" failure
-   this exact literature exists to address (it's the whole premise of WiSig's title, and of
-   Yang et al. 2410.07591's channel-robust PA-nonlinearity feature). Switching to WiSig's
-   channel-equalized variant (`equalized: 1`) fixed it to 100% test accuracy on the same
-   held-out sessions, same architecture, same training budget.
+1. **The baseline CNN overfits to receiver/channel, not device — for BOTH raw and
+   equalized signal.** A baseline CNN trained on `equalized: 0` (raw) IQ hit 100%
+   *validation* accuracy but only **16.7% test accuracy on held-out (day, receiver) sessions
+   — indistinguishable from random guessing on 6 classes.** This is the textbook "RFFI
+   classifier learns the channel, not the transmitter" failure this exact literature exists
+   to address (it's the whole premise of WiSig's title, and of Yang et al. 2410.07591's
+   channel-robust PA-nonlinearity feature).
+   An initial test suggested WiSig's channel-equalized variant (`equalized: 1`) fixed this
+   (100% test accuracy) — **that result was wrong**, caused by an evaluation bug: the test
+   subset used was the first N rows of the test split, which (because `wisig_loader.py`
+   iterates transmitter-outer) happened to be *entirely one device*, a degenerate
+   single-class evaluation. Evaluating on a proper random sample or the full test set shows
+   equalized-signal test accuracy is also **16.4-16.7% — still random chance.** Equalization
+   does not fix this on its own with the current architecture/training budget (5-15 epochs,
+   up to the full 174k train signals tried so far). Lesson for the team: always evaluate on
+   a randomly-shuffled or fully-enumerated subset, never a positional slice of a DataFrame
+   assembled by grouped iteration — this exact class of bug is easy to reintroduce.
+   **This is an open problem for weeks 1-2 of the actual project, not a solved one** — see
+   the "Baseline CNN generalization is unresolved" note below for candidate fixes to try.
 
 2. **Raw CFO conflates transmitter and receiver oscillator offset, and drifts across days.**
    CFO is measured as `tx_LO - rx_LO`, so holding the receiver fixed shows clean per-device
@@ -108,12 +119,30 @@ split via `data/splits/split_seed0.json`).
    have many devices) but is not itself a deployment-ready calibration strategy — say this
    plainly in the writeup rather than presenting it as solved.
 
-4. **Design decision, with evidence:** use the equalized signal consistently for *both* the
-   CNN and the physical-feature extraction, despite raw features being individually more
-   discriminative in isolation (see `data/README.md`). The alternative (CNN on equalized,
-   gate on raw) would let the gate "detect" attacks partly because attack signals live in a
-   different signal-processing domain than the gate was calibrated on — not because the
-   attack is physically implausible. That would be a methodological confound, not a result.
+4. **Design decision that still holds regardless of #1's correction:** use ONE consistent
+   signal representation for *both* the CNN and the physical-feature extraction (currently
+   equalized, since raw already failed and equalized is at least no worse) rather than mixing
+   domains. The alternative (CNN on equalized, gate on raw) would let the gate "detect"
+   attacks partly because attack signals live in a different signal-processing domain than
+   the gate was calibrated on — not because the attack is physically implausible. That would
+   be a methodological confound, not a result. If a future fix changes which domain the CNN
+   uses, update the gate's domain to match.
+
+5. **Baseline CNN cross-session generalization is an open problem, not solved.** Candidate
+   fixes to try in week 1-2 before treating this as blocking:
+   - Transfer learning: train a base model on train-session data, then fine-tune briefly on
+     a small amount of target-session data — this is literally Yang et al. 2410.07591's
+     approach to the same problem, already in our reference list.
+   - A frequency-domain / spectrogram input representation instead of raw time-domain IQ —
+     also the representation Yang et al. found most accurate.
+   - More model capacity or regularization/augmentation across sessions (channel simulation,
+     mixup across receivers) so the model can't shortcut on a single session's channel state.
+   - Sanity-check with a random (not session-aware) split first, to confirm the architecture
+     *can* reach high accuracy at all before concluding a fix targets the right failure mode.
+   Until one of these closes the gap, the whole downstream pipeline (attacks, consistency
+   gate, combined detection) is being evaluated on a classifier that doesn't yet solve its
+   own baseline task on held-out sessions — say so explicitly in any results reported before
+   this is fixed, rather than quietly using in-distribution (non-session-aware) numbers.
 
 ## Rules that keep the experiment valid (do not skip these)
 
