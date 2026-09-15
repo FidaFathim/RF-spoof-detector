@@ -1,9 +1,0 @@
-{
-  "cnn_attack_success_fgsm": 1.0,
-  "cnn_attack_success_pgd": 1.0,
-  "raw_feature_test_frr": null,
-  "session_relative_test_frr": 0.07466666666666667,
-  "combined_detection_fgsm_session_relative": 0.2898318654923939,
-  "combined_detection_pgd_session_relative": 0.2898318654923939,
-  "gate_threshold_session_relative": -10.73293206185701
-}

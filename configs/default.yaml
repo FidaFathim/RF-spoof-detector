@@ -32,9 +32,11 @@ baseline_cnn:
   kernel_size: 7
   dropout: 0.3
   lr: 1.0e-3
-  batch_size: 128
-  epochs: 30
+  batch_size: 256
+  epochs: 15                 # ~3.5 min/epoch on CPU for the full 174k ManySig train split;
+                             # raise on Colab GPU if val_acc is still climbing at the end
   weight_decay: 1.0e-4
+  max_val_samples: 6000      # random subset for per-epoch validation (full val = 60k rows)
 
 features:
   cfo:

@@ -1,9 +1,0 @@
-{
-  "cnn_val_acc": 1.0,
-  "attack_success_fgsm": 1.0,
-  "attack_success_pgd": 1.0,
-  "combined_detection_fgsm": 0.4467574059247398,
-  "combined_detection_pgd": 0.4435548438751001,
-  "false_rejection_rate_clean": 0.8426666666666667,
-  "gate_threshold": -9.462160620106623
-}

@@ -51,9 +51,16 @@ rf-spoof-detection/
 1. Zip this folder (or push it to a private GitHub repo) and get it into your Google Drive.
 2. Open `notebooks/00_colab_setup.ipynb` in Colab, mount Drive, and run the setup cell —
    it installs `requirements.txt` and puts `src/` on `sys.path`.
-3. Follow the notebooks in order: `01` → `06`. Each one is a thin wrapper around `src/`;
-   the real logic lives in `src/` so it's testable and reusable outside Colab too.
-4. Read `data/README.md` before touching WiSig — the exact split rule (session-aware,
+3. Put `ManySig.pkl` at `data/raw/wisig/ManySig.pkl` (see `data/README.md` for the link).
+4. Either follow the notebooks in order (`01` → `06`, each a thin wrapper around `src/`), or
+   run the whole thing in one cell:
+   ```bash
+   python -m src.run_pipeline --config configs/default.yaml --seed 0
+   python -m src.run_pipeline --config configs/default.yaml --all-seeds   # 3 seeds, mean +/- std
+   ```
+   Final table: `results/final_seed0/results_table.md` (+ `diagnostics.json` with the
+   per-receiver false-rejection validity check).
+5. Read `data/README.md` before touching WiSig — the exact split rule (session-aware,
    never packet-random) is what makes the results valid.
 
 ## Local dev (optional, for the feature-extraction unit tests)

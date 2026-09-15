@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from sklearn.preprocessing import LabelEncoder
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, Subset
 
 from ..preprocessing.normalize import iq_to_tensor, unit_energy_normalize
 from ..preprocessing.session_split import apply_split, load_split
@@ -58,6 +58,14 @@ def train_baseline(config: dict, split_path: str, out_dir: str) -> RFFingerprint
     val_ds = IQDataset(parts["val"], label_encoder, data_cfg["iq_length"])
 
     train_loader = DataLoader(train_ds, batch_size=model_cfg["batch_size"], shuffle=True)
+
+    # Per-epoch validation on a fixed RANDOM subset (never a positional slice: the
+    # DataFrame is grouped by transmitter, so `range(N)` would be a single device).
+    max_val = model_cfg.get("max_val_samples")
+    if max_val and max_val < len(val_ds):
+        rng = np.random.default_rng(config["seed"])
+        val_idx = rng.choice(len(val_ds), size=max_val, replace=False).tolist()
+        val_ds = Subset(val_ds, val_idx)
     val_loader = DataLoader(val_ds, batch_size=model_cfg["batch_size"], shuffle=False)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -70,6 +78,9 @@ def train_baseline(config: dict, split_path: str, out_dir: str) -> RFFingerprint
     ).to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=model_cfg["lr"], weight_decay=model_cfg["weight_decay"])
+    # Cosine decay: held-out-session accuracy oscillated 60-94% between epochs at a
+    # constant LR in the week-1 runs; annealing lets the later epochs settle.
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=model_cfg["epochs"])
     criterion = torch.nn.CrossEntropyLoss()
 
     best_val_acc = 0.0
@@ -88,9 +99,11 @@ def train_baseline(config: dict, split_path: str, out_dir: str) -> RFFingerprint
             optimizer.step()
             train_loss += loss.item() * x.size(0)
         train_loss /= len(train_ds)
+        scheduler.step()
 
         val_acc = evaluate_accuracy(model, val_loader, device)
-        logger.info(f"epoch {epoch+1}/{model_cfg['epochs']}  train_loss={train_loss:.4f}  val_acc={val_acc:.4f}")
+        logger.info(f"epoch {epoch+1}/{model_cfg['epochs']}  train_loss={train_loss:.4f}  "
+                    f"val_acc={val_acc:.4f}  lr={scheduler.get_last_lr()[0]:.2e}")
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
