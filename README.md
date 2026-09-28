@@ -27,6 +27,37 @@ The one hypothesis we are actually testing:
 This is a research hypothesis, not a proven result. Treat "novel" as "promising but unverified until
 the literature review + experiments in `PAPER_NOTES.md` / `results/` say otherwise."
 
+## Status (2026-09-28)
+
+All pipeline code (loader, split, CNN, attacks, physical features, consistency gate,
+fusion + ablations, reporting) is implemented and wired end-to-end — see `PLAN.md` for the
+week-by-week build log. What's actually been *run* so far:
+
+- **Verified locally, 44/44 tests green (`pytest tests/`):** the physical-feature
+  estimators against known-injected CFO/I-Q-imbalance/phase-noise ground truth, and — new —
+  the consistency gate, calibration, fusion (AND-rule + all 3 ablations), and metrics
+  modules against synthetic data with a known joint structure. One test in particular,
+  `test_joint_gate_catches_decorrelated_attack_better_than_marginal_gate`, constructs an
+  attack that matches every feature's marginal mean/std but breaks the cross-feature
+  correlation real hardware has, and confirms the joint gate catches it while every
+  single-feature gate doesn't — i.e. it verifies the gate *implementation* behaves the way
+  the design in `PAPER_NOTES.md` claims it should. It is **not** a substitute for running the
+  real attacks against the real trained CNN on real WiSig data.
+- **Blocked on this machine, not a code issue:** this dev environment has a Windows
+  Application Control policy that blocks loading compiled extensions for both `torch` *and*
+  `pandas` (confirmed via direct DLL-load errors, not a missing-package issue) — so nothing
+  that touches a DataFrame or the CNN can execute here. Every module in `src/` that has no
+  pandas/torch dependency (`consistency/`, most of `evaluation/`, `preprocessing/normalize.py`)
+  was confirmed importable and correct in isolation; everything else needs to run where that
+  restriction doesn't apply (Colab, or any machine without this policy) — see Quickstart below.
+- **Not yet run anywhere:** the actual CNN training, attacks, gate calibration on real
+  features, and full evaluation table — i.e. no real detection-rate/false-positive-rate
+  numbers exist yet. Run the one-command pipeline below to produce them.
+
+Read `THREAT_MODEL.md` before trusting any future results table — it states exactly which
+attacker is assumed for each attack, what's out of scope (over-the-air transmission, replay,
+training-time poisoning), and what a high detection rate does and doesn't prove.
+
 ## Repository layout
 
 ```
@@ -63,25 +94,39 @@ rf-spoof-detection/
 5. Read `data/README.md` before touching WiSig — the exact split rule (session-aware,
    never packet-random) is what makes the results valid.
 
-## Local dev (optional, for the feature-extraction unit tests)
+## Local dev (no GPU, no dataset needed)
 
-The three physical-feature estimators (`src/features/*.py`) are pure NumPy/SciPy — no GPU,
-no dataset needed to test them. If you install Python locally:
+Everything under `tests/` is pure NumPy/SciPy/scikit-learn — no GPU, no WiSig download, no
+`torch`/`pandas` needed. If you install Python locally:
 
 ```bash
 pip install -r requirements.txt
 pytest tests/
 ```
 
-`tests/test_features_synthetic.py` generates synthetic IQ signals with a **known** CFO,
-I/Q imbalance, and phase-noise value injected, then checks the estimators recover it —
-this is Step 3 of `PLAN.md` and should be the very first thing that passes before touching
-real WiSig data.
+44 tests, in two groups:
+
+- `test_features_synthetic.py` — generates synthetic IQ signals with a **known** CFO, I/Q
+  imbalance, and phase-noise value injected, then checks the estimators recover it. Step 3
+  of `PLAN.md`; should be the first thing that passes before touching real WiSig data.
+- `test_consistency_gate_synthetic.py`, `test_calibrate.py`, `test_combine.py`,
+  `test_metrics.py`, `test_normalize.py` — exercise the consistency gate, threshold
+  calibration, AND-rule fusion + all 3 ablations, and the evaluation metrics against
+  synthetic feature distributions with a known joint structure. These are what let you
+  trust the gate's *logic* independently of ever running it on real WiSig data.
+
+If `torch` or `pandas` fails to import with a DLL-load error rather than an
+"ImportError: No module named" error, that's a local machine policy (Windows Application
+Control / WDAC / Smart App Control blocking unsigned compiled extensions), not a broken
+install — reinstalling won't fix it. Everything that needs those two packages (the WiSig
+loader, the CNN, the attacks, the full pipeline) has to run somewhere without that
+restriction; Colab is the path this repo is set up for.
 
 ## Key documents
 
 - [`PLAN.md`](PLAN.md) — the 4-week, 2-person build plan and what "done" looks like each week.
 - [`PAPER_NOTES.md`](PAPER_NOTES.md) — literature grounding, the honest novelty-gap analysis, and the rules that keep the experiment valid.
+- [`THREAT_MODEL.md`](THREAT_MODEL.md) — attacker capabilities per attack, what's explicitly out of scope, and what a passing result does/doesn't prove.
 - [`data/README.md`](data/README.md) — WiSig download/layout notes and the session-aware split rule.
 
 ## References

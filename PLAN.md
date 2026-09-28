@@ -45,19 +45,35 @@ never sees attacks).
 - [ ] Train the CNN to convergence on the train split; validate on the val split.
 - [ ] Save checkpoints, confusion matrix, per-device accuracy to `results/baseline/`.
 - [ ] This step is *reproducing known work* — don't over-invest in architecture search.
+      **Blocked on this machine** (2026-09-28): this dev environment's Windows Application
+      Control policy blocks loading `torch`'s compiled extension (confirmed DLL-load error,
+      not a missing package) — training cannot execute here. Run on Colab
+      (`notebooks/02_baseline_cnn.ipynb` or `python -m src.run_pipeline`) instead.
 
 **B — physical features**
 - [ ] Run the feature pipeline (`src/features/pipeline.py`) over all legitimate train/val/test
       signals; save raw + normalized CFO / I-Q-imbalance / phase-noise per sample.
+      **Blocked on this machine for the same reason as above, but for `pandas`** (also
+      confirmed via DLL-load error): `src/features/extract_all.py` needs a WiSig DataFrame,
+      which needs pandas. Run on Colab, or any machine without this policy.
 - [ ] Plot per-device and per-session distributions. Sanity check: features should cluster by
       device; if they cluster by *session/receiver* instead, flag it now (this is the "rules
-      that protect validity" limitation check — do it early, not at the end).
-- [ ] Start training the consistency gate (`src/consistency/gate.py`) — start with the Gaussian/
+      that protect validity" limitation check — do it early, not at the end). Not yet run —
+      depends on the feature-extraction step above.
+- [x] Start training the consistency gate (`src/consistency/gate.py`) — start with the Gaussian/
       Mahalanobis baseline, only add OC-SVM / isolation forest / autoencoder if the simple one
-      is insufficient. Train **only on legitimate training-split signals**.
+      is insufficient. Train **only on legitimate training-split signals**. *(Done 2026-09-28,
+      to the extent possible without pandas/real features: the gate class itself — fit/score,
+      all 3 one-class methods, both per_device/global modes, threshold calibration — is fully
+      implemented and verified against synthetic feature data with a known joint structure;
+      see `tests/test_consistency_gate_synthetic.py`. Training it on the REAL feature CSV still
+      needs the pandas-dependent step above run somewhere without the local block.)*
 
 **Week 2 exit criteria:** baseline CNN trained + evaluated; feature distributions sanity-checked;
-first consistency-gate checkpoint trained.
+first consistency-gate checkpoint trained. **Not yet met** — blocked on running the
+pandas/torch-dependent stages somewhere without this machine's Application Control policy
+(see `README.md` "Status"). The gate/calibration/fusion *logic* is implemented and unit-tested
+(44/44 local tests green); no real numbers exist yet.
 
 ## Week 3 — Attacks + gate calibration
 
