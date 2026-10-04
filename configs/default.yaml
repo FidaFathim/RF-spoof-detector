@@ -59,6 +59,10 @@ attacks:
   uap:
     epsilon: 0.02
     max_iters: 200
+  # The 0.02 epsilons above fool the trained CNN only ~1% of the time (seed 0), so every
+  # defense looks ~100% effective. The sweep reruns all three attacks at each epsilon below
+  # (signals are unit-power, ~0.7 amplitude per I/Q component) and reports the full curve.
+  epsilon_sweep: [0.05, 0.1, 0.2, 0.4]
   gan_impersonation:
     enabled: false   # flip on once the adapted Karunaratne et al. generator is wired up
   hwe:

@@ -223,6 +223,16 @@ def run(config: dict, split_path: str, checkpoint: str, features_csv: str, gate_
             model, x, t, atk_cfg["pgd"]["epsilon"], atk_cfg["pgd"]["alpha"], atk_cfg["pgd"]["steps"])),
         "uap": lambda: apply_uap(x_victim, delta),
     }
+    # Epsilon sweep: the configured epsilons can be too weak to fool the CNN at all, which makes
+    # every defense look ~100% effective. Reporting the whole curve (not a single hand-picked
+    # point) shows where the attack starts to work and what the gate catches from there.
+    steps = atk_cfg["pgd"]["steps"]
+    for eps in atk_cfg.get("epsilon_sweep", []):
+        delta_e = train_uap(model, x_val_victims, target_label_id, eps, atk_cfg["uap"]["max_iters"])
+        attacks[f"fgsm@{eps}"] = lambda e=eps: chunked(lambda x, t: fgsm_targeted(model, x, t, e))
+        attacks[f"pgd@{eps}"] = lambda e=eps: chunked(lambda x, t: pgd_targeted(model, x, t, e, e / 5, steps))
+        attacks[f"uap@{eps}"] = lambda d=delta_e: apply_uap(x_victim, d)
+
     attack_summary = {}
     for name, make in attacks.items():
         x_adv = make().detach()
@@ -230,11 +240,22 @@ def run(config: dict, split_path: str, checkpoint: str, features_csv: str, gate_
         success = cnn_attack_success_rate(pred_adv, target_label_id)
         acc = decisions(x_adv, pred_adv, conf_adv, claimed_attack, sessions_victim)
         det = {k: combined_detection_rate(v) for k, v in acc.items()}
-        attack_summary[name] = {"cnn_attack_success": success, "combined_detection_rate": det}
+        # Detection among attacks that actually fooled the CNN: the only number that isolates
+        # what the extra check adds, since a failed attack is rejected by the CNN alone.
+        fooled = pred_adv == target_label_id
+        n_fooled = int(fooled.sum())
+        det_fooled = {k: (combined_detection_rate(v[fooled]) if n_fooled else None) for k, v in acc.items()}
+        attack_summary[name] = {"cnn_attack_success": success, "n_fooled": n_fooled,
+                                "combined_detection_rate": det, "detection_given_fooled": det_fooled}
         for abl, d in det.items():
-            add_result_row(rows, name, abl, success, d, frr[abl])
-        logger.info(f"{name}: CNN attack success={success:.3f}  detection(gate)={det['separate_consistency_gate']:.3f}  "
-                    f"detection(cnn-conf-only)={det['cnn_confidence_only']:.3f}")
+            add_result_row(rows, name, abl, success, d, frr[abl], det_fooled[abl], n_fooled)
+        gate_f = det_fooled["separate_consistency_gate"]
+        conf_f = det_fooled["cnn_confidence_only"]
+        logger.info(f"{name}: CNN attack success={success:.3f} (n_fooled={n_fooled})  "
+                    f"detection(gate)={det['separate_consistency_gate']:.3f}  "
+                    f"detection(cnn-conf-only)={det['cnn_confidence_only']:.3f}  "
+                    f"| given fooled: gate={gate_f if gate_f is None else round(gate_f, 3)} "
+                    f"cnn-conf-only={conf_f if conf_f is None else round(conf_f, 3)}")
 
     # ---------------- report ----------------
     report = build_report(rows)
