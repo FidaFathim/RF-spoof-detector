@@ -1,0 +1,18 @@
+<section id="baseline" style="background:#F3F5F7;color:#0E1726;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#0B7A87">RESULTS SO FAR</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;width:1500px">First, a baseline classifier that works on unseen sessions</h2>
+<div style="display:flex;align-items:center;gap:56px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:120px;font-weight:700;color:#B26B00;line-height:1">16.7%</p>
+<p style="font-size:30px;line-height:1.35;color:#4A5568;width:560px">earlier accuracy on unseen sessions, the same as random guessing</p>
+</div>
+<x-shape kind="arrow-right" style="background:#0B7A87;width:96px;height:64px"></x-shape>
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-size:120px;font-weight:700;color:#0B7A87;line-height:1">93.8%</p>
+<p style="font-size:30px;line-height:1.35;color:#4A5568;width:640px">now, mean over 3 seeds (± 2.1). Per seed: 94.5%, 91.4%, 95.4%</p>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#2D3A4A;width:1500px">What fixed it: a cosine learning-rate schedule and keeping the best checkpoint, with a session-aware split so the test is honest.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#4A5568">RF spoof detection  ·  10</p>
+<aside>An important result before any defense: the classifier itself. In our early runs the CNN reached only 16.7 percent accuracy on sessions it had never seen, which is chance for six devices; it had learned the channel, not the transmitter. With a cosine learning-rate schedule and best-checkpoint saving, it now reaches 93.8 percent on held-out sessions, averaged over three seeds with a standard deviation of 2.1 points. The split is by session so this number is not inflated by leakage.</aside>
+</section>

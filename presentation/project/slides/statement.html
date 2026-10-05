@@ -1,0 +1,21 @@
+<section id="statement" style="background:#0E1726;color:#F3F5F7;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#2BC4D3">PROBLEM STATEMENT</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Problem statement</h2>
+<p style="font-size:40px;line-height:1.35;color:#E6ECF4;width:1560px">A CNN that identifies radios from their hardware flaws can be fooled by small crafted perturbations. In our tests, <b style="color:#F2B14C">PGD fooled it 93 to 100% of the time</b>. Can an independent, physics-based second check reject forged signals without knowing the attack in advance?</p>
+<div style="display:flex;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:32px">
+<p style="font-size:26px;font-weight:700;color:#2BC4D3">QUESTION 1</p>
+<p style="font-size:28px;line-height:1.4;color:#D5DEEA">Does a separate check catch attacks that already fooled the CNN?</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:32px">
+<p style="font-size:26px;font-weight:700;color:#2BC4D3">QUESTION 2</p>
+<p style="font-size:28px;line-height:1.4;color:#D5DEEA">Is it better than CNN confidence, or than a single feature?</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:32px">
+<p style="font-size:26px;font-weight:700;color:#2BC4D3">QUESTION 3</p>
+<p style="font-size:28px;line-height:1.4;color:#D5DEEA">What does it cost in rejected genuine signals?</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#A9B8CC">RF spoof detection  ·  2</p>
+<aside>State the problem as a question. Radio fingerprinting authenticates a transmitter from its hardware flaws using a CNN, but a small crafted perturbation can make the CNN accept a forged signal; in our tests PGD fooled it 93 to 100 percent of the time. Our question is whether a second, independent check based on hardware physics can reject those forgeries without being told about the attack. We split it into three questions: does it catch attacks that already fooled the CNN, is it better than CNN confidence or a single feature, and what does it cost in wrongly rejected genuine signals. The rest of the talk answers these in order.</aside>
+</section>

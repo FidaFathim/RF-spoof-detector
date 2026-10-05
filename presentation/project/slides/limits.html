@@ -1,0 +1,14 @@
+<section id="limits" style="background:#0E1726;color:#F3F5F7;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#2BC4D3">RESULTS SO FAR  ·  LIMITATIONS</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Limitations we state up front</h2>
+<ul style="font-size:32px;line-height:1.45;color:#E6ECF4;width:1620px">
+<li>One impersonated device only (14-10). Other targets are untested.</li>
+<li>Attacks were fed straight into the classifier. Over-the-air was not tested.</li>
+<li>An attacker who copies the target's hardware numbers would defeat the check. That attack, and the GAN attack, are not implemented.</li>
+<li>Small attacks are not detected (the control test). Large ones (ε = 0.2 to 0.4) are noisy.</li>
+<li>The benefit depends on the session split: PGD at ε = 0.4 was caught 78%, 17%, 74% across seeds.</li>
+<li>False rejections vary by receiver, and calibration needs several devices in the same session.</li>
+</ul>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#A9B8CC">RF spoof detection  ·  16</p>
+<aside>Read these out; saying them first protects us in Q and A. One: we tested only one impersonated device. Two: all attacks were fed directly into the classifier, so we do not claim over-the-air robustness. Three: an attacker who estimates and copies the target's hardware numbers, the HWE attack from a 2026 paper, would defeat a per-device check, and the GAN attack is not implemented. Four: the control test showed small attacks are not detected, and large ones are noisy. Five: results depend heavily on the session split. Six: false rejections vary by receiver, and the session-relative calibration needs several devices in the same session.</aside>
+</section>

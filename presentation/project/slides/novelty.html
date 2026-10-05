@@ -1,0 +1,25 @@
+<section id="novelty" style="background:#0E1726;color:#F3F5F7;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#2BC4D3">NOVELTY</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">What is new, in plain words</h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:18px;background:#16233A;border:2px solid #2BC4D3;border-radius:20px;padding:40px">
+<h3 style="font-size:36px;font-weight:700;color:#2BC4D3">Our contribution</h3>
+<ul style="font-size:30px;line-height:1.4;color:#E6ECF4">
+<li>A separate physical cross-check beside the classifier, per device, that does not rely on the classifier's confidence</li>
+<li>Trained only on genuine signals, so it needs no attack examples</li>
+<li>Tested honestly: control experiments, fair comparisons, 3 seeds, negative results reported</li>
+</ul>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:18px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:40px">
+<h3 style="font-size:36px;font-weight:700;color:#A9B8CC">Not ours (prior work)</h3>
+<ul style="font-size:30px;line-height:1.4;color:#C6D1E0">
+<li>CNN fingerprinting and the FGSM, PGD, UAP attacks</li>
+<li>CFO, I/Q imbalance and phase noise as features</li>
+<li>Closest defense: Yang et al. 2024 compares two classifiers using one feature</li>
+</ul>
+</div>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#F2B14C;width:1550px">Hypothesis tested: a forged signal that fools the CNN does not match real hardware, so a second check can catch it. Partly supported. Details follow.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#A9B8CC">RF spoof detection  ·  5</p>
+<aside>Say this plainly. Plain version of the novelty: existing systems rely on one neural network to decide who is transmitting, and that network can be fooled. We add a second, independent check that asks whether the hardware flaws look like the claimed device. It is trained only on genuine signals, so it does not need to know any attack in advance. Be honest about what is not ours: the CNN, the attacks and the features are all prior work. Our original idea was that the relationship between several features is what makes the check work; our own tests did not support that, and I will show it. What survives is narrower: a separate, per-device physical check that works where classifier confidence fails.</aside>
+</section>

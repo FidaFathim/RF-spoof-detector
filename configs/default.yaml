@@ -21,8 +21,9 @@ data:
                                        # generalization itself is still an open problem to
                                        # solve in week 1-2, not something this flag resolves.
   splits_dir: data/splits
-  sample_rate_hz: 20_000_000          # ASSUMED 20 MSps (standard 802.11 capture rate) — confirm
-                                       # against the WiSig paper before trusting CFO/phase-noise Hz values
+  sample_rate_hz: 25_000_000          # 25 Msps (WiSig paper: USRP receivers captured at 25 Msps). The earlier
+                                       # 20 Msps assumption was wrong: the real signals repeat every 20 samples
+                                       # (similarity 0.99 at shifts 20/40/60/80, 0.08 at 16) = 0.8 us at 25 Msps.
   iq_length: 256                      # confirmed: WiSig "Id Signals" are 256-sample preambles
 
 baseline_cnn:
@@ -40,8 +41,8 @@ baseline_cnn:
 
 features:
   cfo:
-    preamble_len: 160          # 802.11a/g/n L-STF: 10 repetitions x 16 samples
-    repeat_len: 16
+    preamble_len: 200          # 802.11 L-STF: 10 repetitions x 20 samples at 25 Msps (0.8 us per repeat)
+    repeat_len: 20             # 16 would be the 20 Msps value; the WiSig data repeats every 20 samples
     num_repeats: 10
   iq_imbalance:
     window: preamble           # "preamble" or "full" — which segment to estimate over

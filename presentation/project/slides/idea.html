@@ -1,0 +1,33 @@
+<section id="idea" style="background:#F3F5F7;color:#0E1726;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:56px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#0B7A87">PROPOSED METHODOLOGY</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;width:1500px">The idea: accept a signal only if two independent checks agree</h2>
+<div style="display:flex;align-items:center;gap:24px">
+<div style="width:280px;display:flex;flex-direction:column;gap:10px;background:#FFFFFF;border:1px solid #DDE3EA;border-radius:20px;padding:32px">
+<h3 style="font-size:34px;font-weight:700">Signal</h3>
+<p style="font-size:28px;line-height:1.35;color:#4A5568">plus the device it claims to be</p>
+</div>
+<x-shape kind="arrow-right" style="background:#0B7A87;width:64px;height:48px"></x-shape>
+<div style="width:540px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #DDE3EA;border-radius:20px;padding:28px">
+<h3 style="font-size:32px;font-weight:700">Check 1: CNN</h3>
+<p style="font-size:28px;line-height:1.35;color:#4A5568">Does it look like device D?</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#E3F6F8;border:2px solid #0B7A87;border-radius:20px;padding:28px">
+<h3 style="font-size:32px;font-weight:700;color:#0B7A87">Check 2: physics gate</h3>
+<p style="font-size:28px;line-height:1.35;color:#2D3A4A">Could real hardware have produced these flaws?</p>
+</div>
+</div>
+<x-shape kind="arrow-right" style="background:#0B7A87;width:64px;height:48px"></x-shape>
+<div style="width:200px;display:flex;flex-direction:column;align-items:center;background:#0E1726;border-radius:20px;padding:36px">
+<h3 style="font-size:44px;font-weight:700;color:#2BC4D3">AND</h3>
+</div>
+<x-shape kind="arrow-right" style="background:#0B7A87;width:64px;height:48px"></x-shape>
+<div style="width:230px;display:flex;flex-direction:column;gap:6px;background:#FFFFFF;border:1px solid #DDE3EA;border-radius:20px;padding:32px">
+<h3 style="font-size:32px;font-weight:700">Accept</h3>
+<p style="font-size:28px;color:#4A5568">or reject</p>
+</div>
+</div>
+<p style="font-size:30px;line-height:1.4;color:#2D3A4A;width:1500px">Gate features: carrier frequency offset, I/Q amplitude imbalance, I/Q phase imbalance, phase noise. It is trained <b>only on genuine signals</b>.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#4A5568">RF spoof detection  ·  7</p>
+<aside>This is the whole design on one slide. The CNN asks: does this signal sound like device D? The physics gate asks a different question: do the hardware flaws in this signal look like they came from a real radio? The gate measures four physical quantities, learns what genuine signals look like, and never sees an attack during training. We accept only if both agree, so an attacker has to fool two unrelated systems. The attacks we tested only optimise against the CNN.</aside>
+</section>

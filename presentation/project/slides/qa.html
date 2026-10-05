@@ -1,0 +1,24 @@
+<section id="qa" style="background:#0E1726;color:#F3F5F7;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#2BC4D3">BACKUP</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">Backup: likely questions</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:32px">
+<h3 style="font-size:30px;font-weight:700;color:#2BC4D3">Isn't this just anomaly detection?</h3>
+<p style="font-size:26px;line-height:1.4;color:#D5DEEA">Yes, it is a one-class model per device. What is new is using it as an independent second check against adversarial examples, and testing it honestly.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:32px">
+<h3 style="font-size:30px;font-weight:700;color:#2BC4D3">Can an attacker beat it?</h3>
+<p style="font-size:26px;line-height:1.4;color:#D5DEEA">Yes. One who estimates and copies the target's hardware numbers would pass a per-device check. We did not test that attack.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:32px">
+<h3 style="font-size:30px;font-weight:700;color:#2BC4D3">Does it really detect the attack?</h3>
+<p style="font-size:26px;line-height:1.4;color:#D5DEEA">At ε = 0.1 it rejects attacks as often as random noise (about 16%). Only large attacks clearly stand out: PGD at ε = 0.4 is rejected 78% against 20% for noise.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:32px">
+<h3 style="font-size:30px;font-weight:700;color:#2BC4D3">Why three seeds?</h3>
+<p style="font-size:26px;line-height:1.4;color:#D5DEEA">One seed can mislead: PGD at ε = 0.4 was caught 78%, 17% and 74% in three runs. We report mean and spread.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#A9B8CC">RF spoof detection  ·  19</p>
+<aside>Backup slide, only show it if asked. Anomaly detection: yes, it is a one-class model per device; the contribution is the independent second check and the honest evaluation. Can an attacker beat it: yes, one who copies the target's hardware numbers would pass, and we did not test that. Does it detect the attack: at small epsilon it rejects attacks about as often as random noise, so only large attacks clearly stand out. Seeds: single runs swing widely, so mean and spread are the honest report.</aside>
+</section>

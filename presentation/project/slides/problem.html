@@ -1,0 +1,21 @@
+<section id="problem" style="background:#F3F5F7;color:#0E1726;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#0B7A87">INTRODUCTION</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;width:1500px">Radios can be recognised by their hardware flaws, and those flaws can be faked</h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:1px solid #DDE3EA;border-radius:20px;padding:40px">
+<p style="font-size:28px;font-weight:700;color:#0B7A87">1  IDENTIFY</p>
+<p style="font-size:32px;line-height:1.4">Every transmitter has tiny, unique imperfections. A CNN learns to recognise them from raw I/Q samples.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:1px solid #DDE3EA;border-radius:20px;padding:40px">
+<p style="font-size:28px;font-weight:700;color:#0B7A87">2  AUTHENTICATE</p>
+<p style="font-size:32px;line-height:1.4">The receiver trusts a signal only if the CNN says it came from the device it claims to be.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FFFFFF;border:1px solid #DDE3EA;border-radius:20px;padding:40px">
+<p style="font-size:28px;font-weight:700;color:#B26B00">3  ATTACK</p>
+<p style="font-size:32px;line-height:1.4">A tiny crafted perturbation makes the CNN confidently say &quot;trusted device&quot;.</p>
+</div>
+</div>
+<p style="font-size:40px;font-weight:500;line-height:1.3;width:1500px">In our tests, gradient attacks fooled the CNN <b>93 to 100%</b> of the time.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#4A5568">RF spoof detection  ·  3</p>
+<aside>Set up the threat. RF fingerprinting identifies a transmitter from imperfections in its hardware, not from a password. A CNN learns those imperfections. The weakness: the CNN can be attacked. The three attacks we used are FGSM, PGD and UAP; they add a tiny, carefully computed change to the signal. With a strong enough setting, PGD fooled the CNN 93 to 100 percent of the time in our experiments. That is the problem we respond to.</aside>
+</section>

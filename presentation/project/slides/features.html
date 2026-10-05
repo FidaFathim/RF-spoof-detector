@@ -1,0 +1,23 @@
+<section id="features" style="background:#F3F5F7;color:#0E1726;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#0B7A87">PROPOSED METHODOLOGY</p>
+<h2 style="font-size:60px;font-weight:700;line-height:1.1;width:1500px">We checked the features on real data and fixed a wrong assumption</h2>
+<div style="display:flex;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#FFFFFF;border:1px solid #DDE3EA;border-radius:20px;padding:40px">
+<p style="font-size:28px;font-weight:700;color:#B26B00">BEFORE</p>
+<p style="font-size:72px;font-weight:700;line-height:1;color:#B26B00">20 Msps</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Preamble repeats every 16 samples. A guess; the real data disagrees.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#FFFFFF;border:2px solid #0B7A87;border-radius:20px;padding:40px">
+<p style="font-size:28px;font-weight:700;color:#0B7A87">AFTER</p>
+<p style="font-size:72px;font-weight:700;line-height:1;color:#0B7A87">25 Msps</p>
+<p style="font-size:28px;line-height:1.4;color:#4A5568">Repeats every 20 samples, 10 times (200 samples), as the WiSig paper states.</p>
+</div>
+</div>
+<ul style="font-size:30px;line-height:1.4;color:#2D3A4A;width:1600px">
+<li>Evidence: similarity 0.99 at shifts of 20, 40, 60, 80 samples, but only 0.08 at 16</li>
+<li>Both settings mean 0.8 µs, the 802.11 training-sequence period</li>
+<li>With the old setting the estimators compared samples that are not copies, so the Hz values were wrong</li>
+</ul>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#4A5568">RF spoof detection  ·  9</p>
+<aside>A good example of checking an assumption instead of trusting it. Our first configuration assumed 20 Msps with 16-sample repeats. The WiSig paper says the receivers captured at 25 Msps, and the data itself agrees: the repeating pattern has a period of 20 samples, with similarity 0.99 at shifts of 20, 40, 60 and 80 but only 0.08 at 16. Both are 0.8 microseconds, the period of the 802.11 training sequence, which is why only 25 Msps fits 20-sample repeats. With the old setting the CFO and phase-noise estimators compared samples that are not copies of each other, so those values were wrong. We corrected the settings, added a regression test, and reran the evaluation. The classifier results do not depend on this; the physics-check results do.</aside>
+</section>

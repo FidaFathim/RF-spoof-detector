@@ -1,0 +1,27 @@
+<section id="ablation" style="background:#0E1726;color:#F3F5F7;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:30px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#2BC4D3">RESULTS SO FAR</p>
+<h2 style="font-size:56px;font-weight:700;line-height:1.1;width:1550px">No joint advantage: one feature does as well</h2>
+<p style="font-size:28px;color:#A9B8CC">Share of successful attacks caught, % (mean of 3 seeds)</p>
+<table style="font-size:30px;color:#F3F5F7;font-family:'DM Sans', Arial, sans-serif;width:1664px">
+<tr style="background:#16233A"><th style="width:32%;text-align:left">Method</th><th style="width:12%;text-align:right">PGD 0.2</th><th style="width:12%;text-align:right">PGD 0.4</th><th style="width:12%;text-align:right">UAP 0.4</th><th style="width:12%;text-align:right">FGSM 0.4</th><th style="width:20%;text-align:right">Genuine rejected</th></tr>
+<tr><td style="text-align:left">CNN confidence only</td><td style="text-align:right">0</td><td style="text-align:right">0</td><td style="text-align:right">0</td><td style="text-align:right">18</td><td style="text-align:right">8.2%</td></tr>
+<tr style="background:#123A44"><td style="text-align:left;color:#2BC4D3">Joint physics check</td><td style="text-align:right;color:#2BC4D3">23</td><td style="text-align:right;color:#2BC4D3">56</td><td style="text-align:right;color:#2BC4D3">32</td><td style="text-align:right;color:#2BC4D3">48</td><td style="text-align:right;color:#2BC4D3">10.4%</td></tr>
+<tr style="background:#3A2B14"><td style="text-align:left;color:#F2B14C">I/Q phase imbalance alone</td><td style="text-align:right;color:#F2B14C">38</td><td style="text-align:right;color:#F2B14C">67</td><td style="text-align:right;color:#F2B14C">44</td><td style="text-align:right;color:#F2B14C">49</td><td style="text-align:right;color:#F2B14C">11.4%</td></tr>
+</table>
+<div style="display:flex;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:30px">
+<p style="font-size:64px;font-weight:700;line-height:1;color:#F2B14C">≤ 0.13</p>
+<p style="font-size:26px;line-height:1.35;color:#D5DEEA">largest correlation between the four numbers inside one device</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:30px">
+<p style="font-size:64px;font-weight:700;line-height:1;color:#F2B14C">0.003</p>
+<p style="font-size:26px;line-height:1.35;color:#D5DEEA">AUC gained by modelling them jointly (per-device check)</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:30px">
+<p style="font-size:64px;font-weight:700;line-height:1;color:#F2B14C">0 of 12</p>
+<p style="font-size:26px;line-height:1.35;color:#D5DEEA">alternative designs beat the simple per-device Gaussian</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#A9B8CC">RF spoof detection  ·  13</p>
+<aside>This slide keeps us honest, and it is where our original hypothesis fails. We expected the relationship between several hardware numbers to be what catches forgeries. We tested the premise directly: inside a single device the four numbers are almost uncorrelated, at most 0.13, and modelling them jointly instead of independently changes the AUC by only 0.003 for the per-device check and 0.012 for the global one. We also compared twelve designs on validation data, including Isolation Forest, global versus per-device, and feature subsets, and none beat the simple per-device Gaussian on attack detection. A check using I/Q phase imbalance alone does as well as or better than the joint check. So we cannot claim the combination of features matters. What we can claim is that a separate, per-device physical check beats classifier confidence against strong attacks.</aside>
+</section>

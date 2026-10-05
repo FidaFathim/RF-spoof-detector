@@ -1,0 +1,23 @@
+<section id="attacks" style="background:#0E1726;color:#F3F5F7;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#2BC4D3">RESULTS SO FAR</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1;width:1500px">Attacks only work above a minimum strength</h2>
+<div style="display:flex;gap:56px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:28px;color:#A9B8CC">Share of attacks that fooled the CNN (mean of 3 seeds)</p>
+<table style="font-size:32px;color:#F3F5F7;font-family:'DM Sans', Arial, sans-serif;width:880px">
+<tr style="background:#16233A"><th style="width:28%;text-align:left">Strength ε</th><th style="width:24%;text-align:right">FGSM</th><th style="width:24%;text-align:right">PGD</th><th style="width:24%;text-align:right">UAP</th></tr>
+<tr style="background:#3A2B14"><td style="text-align:left;color:#F2B14C">0.02</td><td style="text-align:right;color:#F2B14C">3%</td><td style="text-align:right;color:#F2B14C">4%</td><td style="text-align:right;color:#F2B14C">1%</td></tr>
+<tr><td style="text-align:left">0.05</td><td style="text-align:right">19%</td><td style="text-align:right">40%</td><td style="text-align:right">16%</td></tr>
+<tr><td style="text-align:left">0.10</td><td style="text-align:right">47%</td><td style="text-align:right">93%</td><td style="text-align:right">49%</td></tr>
+<tr><td style="text-align:left">0.20</td><td style="text-align:right">81%</td><td style="text-align:right">100%</td><td style="text-align:right">95%</td></tr>
+<tr><td style="text-align:left">0.40</td><td style="text-align:right">78%</td><td style="text-align:right">100%</td><td style="text-align:right">99%</td></tr>
+</table>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:18px;background:#16233A;border:2px solid #F2B14C;border-radius:20px;padding:40px">
+<h3 style="font-size:34px;font-weight:700;color:#F2B14C">A mistake we caught</h3>
+<p style="font-size:30px;line-height:1.4;color:#E6ECF4">Our first run used ε = 0.02. The attacks failed, so every defense looked 99% effective. That number meant nothing, so we added this strength sweep.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#A9B8CC">RF spoof detection  ·  11</p>
+<aside>This slide is about honesty in evaluation. Our first configuration used a perturbation strength of 0.02, and the attacks fooled the CNN only about 1 to 4 percent of the time. Because a failed attack is rejected by the CNN alone, every defense looked around 99 percent effective, which proved nothing about the physics gate. So we swept the strength. PGD fools the CNN 93 percent of the time at 0.1 and 100 percent at 0.2 and above. FGSM and UAP follow similar curves. From here on, we report detection among attacks that actually fooled the CNN.</aside>
+</section>

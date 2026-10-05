@@ -1,0 +1,24 @@
+<section id="setup" style="background:#0E1726;color:#F3F5F7;font-family:'DM Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="position:absolute;left:128px;top:64px;width:1200px;font-size:24px;font-weight:700;letter-spacing:3px;color:#2BC4D3">PROPOSED METHODOLOGY</p>
+<h2 style="font-size:64px;font-weight:700;line-height:1.1">What we tested</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:14px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:36px">
+<h3 style="font-size:36px;font-weight:700;color:#2BC4D3">Real data</h3>
+<p style="font-size:30px;line-height:1.4;color:#D5DEEA">WiSig ManySig: 6 transmitters, 12 receivers, 4 capture days, 288,000 signals.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:36px">
+<h3 style="font-size:36px;font-weight:700;color:#2BC4D3">No leakage</h3>
+<p style="font-size:30px;line-height:1.4;color:#D5DEEA">Split by session (day and receiver), never by packet: 174k train, 60k validation, 54k test.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:36px">
+<h3 style="font-size:36px;font-weight:700;color:#2BC4D3">Attacks</h3>
+<p style="font-size:30px;line-height:1.4;color:#D5DEEA">FGSM, PGD, UAP, all claiming to be one device (14-10). Full access to the CNN, fed straight in.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#16233A;border:1px solid #24344F;border-radius:20px;padding:36px">
+<h3 style="font-size:36px;font-weight:700;color:#2BC4D3">Rigor</h3>
+<p style="font-size:30px;line-height:1.4;color:#D5DEEA">3 random seeds. Thresholds set on validation only. The check never sees an attack.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:800px;font-size:24px;color:#A9B8CC">RF spoof detection  ·  8</p>
+<aside>Four things to say. Data: a public dataset with real captured radio signals. Splitting: we split by capture session, not by random packet, because packets from the same session share the same channel and would leak information. Attacks: all three attacks assume the attacker knows the CNN and feeds the perturbed signal directly to it; we did not test over-the-air transmission. Rigor: three seeds, thresholds tuned on validation data only, and the physics gate is trained only on genuine signals.</aside>
+</section>
